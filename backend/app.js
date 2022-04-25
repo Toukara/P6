@@ -40,13 +40,23 @@ app.get("/", (req, res) => {
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 200, // limit each IP to 200 requests per windowMs
+  message: "Too many requests, please try again later",
 });
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // limit each IP to 20 requests per windowMs
+  message: "Too many requests from this IP, please try again later",
+});
+
+app.use("/api/auth", authLimiter);
 
 app.use("/api", (req, res, next) => {
   apiLimiter;
   next();
 });
+
 app.use("/api", apiRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
 

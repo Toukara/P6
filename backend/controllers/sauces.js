@@ -49,6 +49,10 @@ exports.editSauce = async (req, res, next) => {
     return res.status(404).json({ error: "Sauce not found" });
   }
 
+  if (!req.body.userId || !req.body.name || !req.body.manufacturer || !req.body.description || !req.body.mainPepper || !req.body.heat) {
+    return res.status(400).json({ error: "Please provide all the fields" });
+  }
+
   await Sauces.updateOne(
     { _id: req.params.id },
     {
@@ -69,8 +73,6 @@ exports.deleteSauce = async (req, res, next) => {
 
   var n = sauce.imageUrl.lastIndexOf("/");
   var result = sauce.imageUrl.substring(n + 1);
-
-  console.log(result);
 
   if (!sauce) {
     return res.status(404).json({ error: "Sauce not found" });
@@ -104,111 +106,60 @@ exports.likeSauce = async (req, res, next) => {
       )
       .catch((error) => res.status(400).json({ error: error }));
   } else if (param === 1) {
-    await Sauces.updateOne(
-      { _id: req.params.id },
-      {
-        $inc: { likes: 1 },
-        $push: { usersLiked: req.body.userId },
-        _id: req.params.id,
-      }
-    )
-      .then(() => res.status(200).json({ message: "Sauce liked" }))
-      .catch((error) => res.status(400).json({ error: error }));
+    if (sauce.usersLiked.includes(req.body.userId)) {
+      return res.status(200).json({ message: "You already liked this sauce" });
+    } else if (sauce.usersDisliked.includes(req.body.userId)) {
+      await Sauces.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { dislikes: -1, likes: 1 },
+          $pull: { usersDisliked: req.body.userId },
+          $push: { usersLiked: req.body.userId },
+          _id: req.params.id,
+        }
+      )
+        .then(() => res.status(200).json({ message: "Dislike removed and like added" }))
+        .catch((error) => res.status(400).json({ error: error }));
+    } else {
+      await Sauces.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { likes: 1 },
+          $push: { usersLiked: req.body.userId },
+          _id: req.params.id,
+        }
+      )
+        .then(() => res.status(200).json({ message: "Sauce liked" }))
+        .catch((error) => res.status(400).json({ error: error }));
+    }
   } else if (param === -1) {
-    await Sauces.updateOne(
-      { _id: req.params.id },
-      {
-        $inc: { dislikes: 1 },
-        $push: { usersDisliked: req.body.userId },
-        _id: req.params.id,
-      }
-    )
-      .then(() => res.status(200).json({ message: "Sauce disliked" }))
-      .catch((error) => res.status(400).json({ error: error }));
+    if (sauce.usersDisliked.includes(req.body.userId)) {
+      return res.status(200).json({ message: "You already disliked this sauce" });
+    } else if (sauce.usersLiked.includes(req.body.userId)) {
+      await Sauces.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { dislikes: 1, likes: -1 },
+          $pull: { usersLiked: req.body.userId },
+          $push: { usersDisliked: req.body.userId },
+          _id: req.params.id,
+        }
+      )
+        .then(() => res.status(200).json({ message: "Like removed and like added" }))
+        .catch((error) => res.status(400).json({ error: error }));
+    } else {
+      await Sauces.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { dislikes: 1 },
+          $push: { usersDisliked: req.body.userId },
+          _id: req.params.id,
+        }
+      )
+        .then(() => res.status(200).json({ message: "Sauce disliked" }))
+        .catch((error) => res.status(400).json({ error: error }));
+    }
   } else {
     res.status(400).json({ error: "Bad request" });
   }
 };
-// switch (req.body.like) {:
-//   //cancel = 0
-//   //check if the user had liked or disliked the sauce
-//   //uptade the sauce, send message/error
-//   case 0:
-//     Sauces.findOne({ _id: req.params.id })
-//       .then((sauce) => {
-//         if (sauce.usersLiked.find((user) => user === req.body.userId)) {
-//           Sauces.updateOne(
-//             { _id: req.params.id },
-//             {
-//               $inc: { likes: -1 },
-//               $pull: { usersLiked: req.body.userId },
-//               _id: req.params.id,
-//             }
-//           )
-//             .then(() => {
-//               res.status(201).json({ message: "Ton avis a été pris en compte!" });
-//             })
-//             .catch((error) => {
-//               res.status(400).json({ error: error });
-//             });
-//         }
-//         if (sauce.usersDisliked.find((user) => user === req.body.userId)) {
-//           Sauces.updateOne(
-//             { _id: req.params.id },
-//             {
-//               $inc: { dislikes: -1 },
-//               $pull: { usersDisliked: req.body.userId },
-//               _id: req.params.id,
-//             }
-//           )
-//             .then(() => {
-//               res.status(201).json({ message: "Ton avis a été pris en compte!" });
-//             })
-//             .catch((error) => {
-//               res.status(400).json({ error: error });
-//             });
-//         }
-//       })
-//       .catch((error) => {
-//         res.status(404).json({ error: error });
-//       });
-//     break;
-//   //likes = 1
-//   //uptade the sauce, send message/error
-//   case 1:
-//     Sauces.updateOne(
-//       { _id: req.params.id },
-//       {
-//         $inc: { likes: 1 },
-//         $push: { usersLiked: req.body.userId },
-//         _id: req.params.id,
-//       }
-//     )
-//       .then(() => {
-//         res.status(201).json({ message: "Ton like a été pris en compte!" });
-//       })
-//       .catch((error) => {
-//         res.status(400).json({ error: error });
-//       });
-//     break;
-//   //likes = -1
-//   //uptade the sauce, send message/error
-//   case -1:
-//     Sauces.updateOne(
-//       { _id: req.params.id },
-//       {
-//         $inc: { dislikes: 1 },
-//         $push: { usersDisliked: req.body.userId },
-//         _id: req.params.id,
-//       }
-//     )
-//       .then(() => {
-//         res.status(201).json({ message: "Ton dislike a été pris en compte!" });
-//       })
-//       .catch((error) => {
-//         res.status(400).json({ error: error });
-//       });
-//     break;
-//   default:
-//     console.error("not today : mauvaise requête");
-// }
