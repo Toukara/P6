@@ -145,7 +145,7 @@ exports.likeSauce = async (req, res, next) => {
           _id: req.params.id,
         }
       )
-        .then(() => res.status(200).json({ message: "Like removed and like added" }))
+        .then(() => res.status(200).json({ message: "Like removed and dislike added" }))
         .catch((error) => res.status(400).json({ error: error }));
     } else {
       await Sauces.updateOne(
