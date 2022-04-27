@@ -3,6 +3,7 @@
 > ORIGIN : [GitHub repo origin](https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6)
 
 > Note : Check if you have a version of [NodeJS](https://nodejs.org/en/) newest or egal to v16.15.1.
+
 > Note : Check if Npm is installed `npm -v` and if you have a version of [Npm](https://www.npmjs.com/) newest or egal to v8.5.4.
 
 ---
