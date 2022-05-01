@@ -72,9 +72,6 @@ npm start
 Create a file named `.env` in the backend folder. (It will be ignored by git)
 (You can find an example in the `.env.example` file)
 
-````bash
-
-```bash
 
 ## 🚀 Open the browser
 
@@ -82,4 +79,3 @@ Open the browser to access the website:
 **http://localhost:4200/** (**localhost** is the computer's IP address)
 
 And the backend is running on: **http://localhost:3000/**
-````
