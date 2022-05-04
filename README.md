@@ -67,6 +67,12 @@ npm start
 
 <br>
 
+## ✍️ Changes
+
+Create a file named `.env` in the backend folder. (It will be ignored by git)
+(You can find an example in the `.env.example` file)
+
+
 ## 🚀 Open the browser
 
 Open the browser to access the website:
