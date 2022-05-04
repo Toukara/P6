@@ -22,8 +22,6 @@ exports.createSauce = async (req, res, next) => {
 
   const imageUrl = `http://localhost:3000/images/${req.file.filename}`; //une mauvaise idée de mettre tout l'URL dans la base de données
 
-  console.log(req.body.sauce);
-
   const sauce = new Sauces({
     userId: userId,
     name: name,
@@ -33,8 +31,6 @@ exports.createSauce = async (req, res, next) => {
     imageUrl: imageUrl,
     heat: heat,
   });
-
-  console.log(sauce);
 
   await sauce
     .save()
